@@ -1,0 +1,62 @@
+{% load bootstrap4%}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Analisador Léxico</title>
+        {% bootstrap_css %}
+    </head>
+    <style>
+        .container {
+            margin-top: 40px;
+            background-color: rgba(161, 153, 172, 0.15);
+            border-radius: 30px;
+            color: #6B6471;
+        }
+        .btn {
+            background-color: #DE88B9;
+            border: #DE88B9;
+        }
+    </style>
+    <body>
+        <div class="d-flex justify-content-center align-items-center">
+
+        <div class="container">
+            <h1>Analisador Léxico</h1>
+            <form action="{%url 'analisador'%}" method="POST" class="form" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <button type="submit" class="btn btn-primary">Analisar arquivo</button>
+            {% endbuttons %}
+            </form>
+
+
+            <h2>Meus arquivos:</h2>
+            <ul>
+              {% for arquivo in arquivos %}
+              <h6>
+                {{ arquivo }} <br>
+                {{arquivo.nome}} <a href="{% url 'deletar_arquivo' arquivo.pk %}">excluir</a>
+              </h6>
+            </ul>
+            {% endfor %}
+
+            {% for arquivo in analisar_arquivo %}
+            <h6>
+              {{arquivo}}}
+            </h6>
+        {% endfor %}
+
+        {% for file in file_content %}
+        <h6>
+            {{file}}}
+          </h6>
+        {% endfor %}
+            </div>
+</div>
+      
+        {% bootstrap_javascript jquery='full'%}
+    </body>
+</html>
