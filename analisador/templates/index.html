@@ -10,15 +10,20 @@
 </head>
 <style>
   body {
-    background-color: rgba(161, 153, 172, 0.15);
+    /* background-color:#230f47; */
+    background-image: linear-gradient( #7175da, #9790F2);
+    background-repeat: no-repeat;
+    height: 100%;
+    background-attachment: fixed;
   }
-  .container {
+  .row {
     margin-top: 40px;
-    background-color:#fff;
+    background-color:rgb(255, 255, 255);
     border-radius: 30px;
     color: #6B6471;
-    box-shadow: 0 0 10px rgba(69, 69, 69, 0.9);
-    -webkit-box-shadow: 0 0 10px rgba(71, 71, 71, 0.6);
+    box-shadow: 0 10px 10px rgba(68, 68, 68, 0.2);
+    /* box-shadow: 0 0 10px rgba(69, 69, 69, 0.9); */
+    /* -webkit-box-shadow: 0 0 10px rgba(71, 71, 71, 0.6); */
   }
   #id_nome {
     background-color: transparent;
@@ -29,8 +34,9 @@
     background-color: #ffd6eb32;
     color:white;
   } */
+  
   .btn {
-    background-color: #DE88B9;
+    background-color: #2A265F;
     border: #DE88B9;
     border-radius: 30px;
   }
@@ -39,45 +45,34 @@
     border: #e16daf;
     border-radius: 30px;
   }
+  .nome{
+    background-color: #2A265F;
+    color: #fff;
+    border-radius:30px 0px 0px 30px;
+  }
+
 </style>
 
 <body>
   <div class="d-flex justify-content-center align-items-center">
 
-    <div class="container justify-content-center align-items-center">
-      <h1 class="text-center">Analisador Léxico</h1>
-      <form action="{%url 'analisador'%}" method="POST" class="form" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        {% buttons %}
-        <button type="submit" class="btn btn-primary">Analisar arquivo</button>
-        {% endbuttons %}
-      </form>
-          
-    <ul>
-        {% for arquivo in arquivos %}
-        <h6>
-          {{ arquivo.arquivo }} <br>
-          {{arquivo.nome}} <a href="{% url 'deletar_arquivo' arquivo.pk %}">excluir</a>
-        </h6>
-        
+    <!-- <div class="container justify-content-center align-items-center" > -->
+      <div class="row row-cols-2">
+        <div class="col-3 col-sm-3  nome p-3">
+          <h1 class="texto-principal">Analisador Léxico</h1>
+        </div>
+        <div class="col-9 col-sm-9 p-3">
       
-      {% for arquivo in analisar_arquivo %}
-      <h6>
-        {{arquivo }}
-      </h6>
-    </ul>
-      {% endfor %}
-      {% endfor %}
-  
-      {% comment %}
-  
-      {% for file in file_content %}
-      <h6>
-        {{file}}
-      </h6>
-      {% endfor %} {% endcomment %}
-  
+          <form action="{%url 'analisador'%}" method="POST" class="form" enctype="multipart/form-data" >
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <button type="submit" class="btn btn-primary" align="center">Analisar arquivo</button>
+            {% endbuttons %}
+          </form>
+        <!-- </div> -->
+      </div>
+
 
 
   </div>
