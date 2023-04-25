@@ -28,39 +28,24 @@ class Arquivo(models.Model):
             # print('token regex', token_regex)
             # i = 0
             # self.posicaoInicial = 0
-        TOKEN_TYPES = {
-        'IDENTIFIER': Identifier,
-        'INTEGER': Integer,
-        'FLOAT': Float,
-        'OPERATOR': Operator,
-        'DELIMITER': Delimiter,
-        }
+        # TOKEN_TYPES = {
+        # 'IDENTIFIER': Identifier,
+        # 'INTEGER': Integer,
+        # 'FLOAT': Float,
+        # 'OPERATOR': Operator,
+        # 'DELIMITER': Delimiter,
+        # }
         tokens_list = []
         for line in arquivo.split('\n'):
-            print('aq')
+            print('aqui?')
             for match in re.finditer(token_regex, line):
                 for name, exp in regex.items():
                     if(match.lastgroup == name):
                         token_type = name
                         lexeme = match.group(name)
-
-                    # for token_type, lexeme in get_tokens(text):
-                    #     if token_type in TOKEN_TYPES:
-                    #         try:
-                    #             TOKEN_TYPES[token_type](lexeme).validate(token_type)
-                    #             tokens_list.append((token_type, lexeme))
-                    #         except TokenValidationException as e:
-                    #             print(f"Error: {e}")
-                    #     else:
-                    #         print(f"Error: Invalid token type {token_type}")
-                    #     for token_type, lexeme in tokens_list:
-                    #         print(f"Token type: {token_type.__name__}, Lexeme: {lexeme}")
-
-                    # int aaa
-                    # int bbb 
-                        # if token_type == 'identifier':
-                            # satsifaz aaa bbb
+                        print('lexeme', lexeme)
                         try:
+                            print('oi')
                             if Identifier(lexeme).validate():
                                 tokens_list.append((token_type, lexeme))
                         except IdentifierException as e:
@@ -91,6 +76,25 @@ class Arquivo(models.Model):
                                 tokens_list.append((token_type, lexeme))
                         except KeywordException as e:
                                 print('Error: {}'.format(e)) 
+                return tokens_list
+
+                    # for token_type, lexeme in get_tokens(text):
+                    #     if token_type in TOKEN_TYPES:
+                    #         try:
+                    #             TOKEN_TYPES[token_type](lexeme).validate(token_type)
+                    #             tokens_list.append((token_type, lexeme))
+                    #         except TokenValidationException as e:
+                    #             print(f"Error: {e}")
+                    #     else:
+                    #         print(f"Error: Invalid token type {token_type}")
+                    #     for token_type, lexeme in tokens_list:
+                    #         print(f"Token type: {token_type.__name__}, Lexeme: {lexeme}")
+
+                    # int aaa
+                    # int bbb 
+                        # if token_type == 'identifier':
+                            # satsifaz aaa bbb
+
                         # # try:
                         #         Keyword(lexeme).validate()
                         #         tokens_list.append((token_type, lexeme))
@@ -124,5 +128,5 @@ class Arquivo(models.Model):
                         #     # token = <tipo, valor>
                         #     tokens_list.append((token_type, lexeme))
       
-        return tokens_list
+        
 

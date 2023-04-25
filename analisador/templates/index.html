@@ -53,34 +53,39 @@
         <button type="submit" class="btn btn-primary">Analisar arquivo</button>
         {% endbuttons %}
       </form>
+          
+    <ul>
+        {% for arquivo in arquivos %}
+        <h6>
+          {{ arquivo.arquivo }} <br>
+          {{arquivo.nome}} <a href="{% url 'deletar_arquivo' arquivo.pk %}">excluir</a>
+        </h6>
+        
+      
+      {% for arquivo in analisar_arquivo %}
+      <h6>
+        {{arquivo }}
+      </h6>
+    </ul>
+      {% endfor %}
+      {% endfor %}
+  
+      {% comment %}
+  
+      {% for file in file_content %}
+      <h6>
+        {{file}}
+      </h6>
+      {% endfor %} {% endcomment %}
+  
 
 
   </div>
  
-    <div class="container justify-content-center align-items-center d-none">
+    {% comment %} <div class="container">
 
     
-    <ul>
-      {% for arquivo in arquivos %}
-      <h6>
-        {{ arquivo }} <br>
-        {{arquivo.nome}} <a href="{% url 'deletar_arquivo' arquivo.pk %}">excluir</a>
-      </h6>
-    </ul>
-    {% endfor %}
-
-    {% for arquivo in analisar_arquivo %}
-    <h6>
-      {{arquivo}}
-    </h6>
-    {% endfor %}
-
-    {% for file in file_content %}
-    <h6>
-      {{file}}
-    </h6>
-    {% endfor %}
-    </div>
+    </div> {% endcomment %}
   
   </div>
 

@@ -1,6 +1,5 @@
 import re
 
-
 class IdentifierException(Exception):
     def __init__(self, value):
         self.value = value
@@ -13,7 +12,6 @@ class Identifier:
     SUPPORTED_TYPES = ['IDENTIFIER']
     def __init__(self, value):
         self.value = value
-
        
     def validate(self):
         reserved_words = {'int': 'INT', 'char': 'CHAR', 'long': 'LONG', 'short': 'SHORT', 'float': 'FLOAT',
