@@ -4,8 +4,6 @@ from .exceptions import IdentifierException, KeywordException, IntegerException,
 from .exceptions import ExceptionGenerator,Identifier, Keyword, Integer, Float, Operator, Delimiter
 # Create your models here.
 
-
-
 class Arquivo(models.Model):
     nome = models.CharField(max_length=100)
     arquivo = models.FileField(upload_to='arquivos/')
@@ -33,16 +31,18 @@ class Arquivo(models.Model):
         regex = {
             # Expressões regulares para palavras-chaves, identificadores, operadores, delimitadores, inteiros, floats e strings
             'keyword': r'(?<!\w)(int|char|long|short|float|double|void|if|else|for|while|do|break|continue|struct|switch|case|default|return|main|printf|scanf|elif|auto|enum|extern|goto|register|signed|sizeof|static|typedef|union|unsigned|volatile|while)(?!\w)',
-            'identifier': r'\b[a-zA-Z_][a-zA-Z0-9_]*\b',
             'operator': r'(\+\+|--|->|&&|\|\||<<|>>|<=|>=|==|!=|[!%^&*+=\-\|/~<>\?])',
             'delimiter': r'(\(|\)|\[|\]|\{|\}|;|,|:)',
             'float': r'(?<!\w)[-+]?(\d*\.\d+|\d+\.\d*)([eE][-+]?\d+)?\b',
             'integer': r'\d+[a-zA-Z]*',
             'string': r'"[^"\n]*"',
+            'identifier': r'(?!\b(auto|break|main|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|_Bool|_Complex|_Imaginary)\b)[a-zA-Z_]\w*', 
+            #'identifier': r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', 
         }
         #
         token_regex = '|'.join('(?P<%s>%s)' % (name, exp)
                                for name, exp in regex.items())
+
         # agrupando o dic regex 
         print('token regex', token_regex)
 
@@ -51,14 +51,21 @@ class Arquivo(models.Model):
         errors = []
         last_lexeme = None
         i = 0
+
         codigoFonte = re.sub(
             r'(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)', '', codigoFonte)
+
         for line in codigoFonte.split('\n'):
             for match in re.finditer(token_regex, line):
+
                 for name, exp in regex.items():
+
                     if(match.lastgroup == name):
+
                         token_type = name
+
                         lexeme = match.group(name)
+                        
                         print(token_type)
                         print(lexeme)
                         ###############################
@@ -139,6 +146,8 @@ class Arquivo(models.Model):
                                     print("Error!")
                                     errors.append(
                                         'O lexeme {} não é válido'.format(lexeme))
+                            else:
+                                print("Erro")
                         except ExceptionGenerator as e:
                             print("Passou?")
                             print("Error: {}".format(e))

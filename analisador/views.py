@@ -24,7 +24,7 @@ class FormView(FormView):
 
         if extensao.lower() != '.c':
             form.add_error('arquivo', 'Por favor, selecione um arquivo em C.')
-            return render(request, self.template_name, {'form': form, 'analisar_arquivo': analisar_arquivo, 'arquivos': arquivos})
+            return render(request, self.template_name, {'form': form})
         arquivo = form.save(commit=False)
         arquivo.save()
 
@@ -41,7 +41,7 @@ class FormView(FormView):
         else:
             print('Conteúdo:', file_content)
         analisar_arquivo = Arquivo.analyse(file_content)
-        print('analisar', analisar_arquivo)
+       # print('analisar', analisar_arquivo)
 
         arquivos = Arquivo.objects.filter()
         

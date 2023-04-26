@@ -30,11 +30,14 @@ class Identifier:
         if self.value in reserved_words:
             raise IdentifierException(
                 f"Identificador Inválido: {self.value}")
-        if not re.match(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', self.value):
+        if not re.match(r'\b[a-zA-Z_][\w]*\b', self.value):
+            print('vamo ver', self.value)
             raise IdentifierException(
                 f"Identificador inválido: {self.value}.")
 
         return True
+
+
 
 
 class KeywordException(Exception):
