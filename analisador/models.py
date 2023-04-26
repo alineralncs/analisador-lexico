@@ -1,132 +1,149 @@
 from django.db import models
 import re
-from .exceptions import IdentifierException, KeywordException, IntegerException, FloatException, OperatorException, DelimiterException
-from .exceptions import Identifier, Keyword, Integer, Float, Operator, Delimiter
+from .exceptions import IdentifierException, KeywordException, IntegerException, FloatException, OperatorException, DelimiterException, StringValidation
+from .exceptions import ExceptionGenerator,Identifier, Keyword, Integer, Float, Operator, Delimiter
 # Create your models here.
+
+
 
 class Arquivo(models.Model):
     nome = models.CharField(max_length=100)
     arquivo = models.FileField(upload_to='arquivos/')
 
-    def __str__(self):
+    def __str__():
         return self.nome
+    # r'(\*[_a-zA-Z][_a-zA-Z0-9]*)|([_a-zA-z][_a-zA-Z0-9]*)
 
-    def analisar(self, arquivo): 
+    # r'(\*[_a-zA-Z][_a-zA-Z0-9]*)|([_a-zA-Z][_a-zA-Z0-9]*)'
+    def analyse(codigoFonte):
+        keywords = ['int', 'char', 'long', 'short', 'float', 'double', 'void', 'if', 'else', 'for', 'while',
+                             'do', 'break', 'continue', 'struct', 'switch', 'case', 'default', 'return', 'main',
+                             'printf', 'scanf']
+        types = [
+                'int',
+                'char',
+                'long',
+                'float',
+                'double',
+                'void',
+                'String',
+                'char'
+            ]
+
         regex = {
             # Expressões regulares para palavras-chaves, identificadores, operadores, delimitadores, inteiros, floats e strings
-            'keyword': r'(int|char|long|short|float|double|void|if|else|for|while|do|break|continue|struct|switch|case|default|return)',
-            'identifier': r'[a-zA-Z_][a-zA-Z0-9_]*',
-            'operator': r'[+\-*/]|<=|>=|==|!=|\|\||&&|[()!]|(?<=[^+\-*/])\+(?=[^+\-*/=])|(?<=[^+\-*/])\-(?=[^+\-*/=])|\+=(?!=)|-=(?!=)|\*=(?!=)|/=(?!=)|<(?!=)|>(?!=)|(?<=<)=|(?<=>)=|%(?!=)|->(?!=)',
-            'delimiter': r'(\(|\)|\[|\]|\{|\}|;|,)',
-            'integer': r'\d+',
-            'float': r'\d+\.\d+',
-            'string': r'"(?:\\.|[^\\"])*"|\'(?:\\.|[^\\\'])*\'',
+            'keyword': r'(?<!\w)(int|char|long|short|float|double|void|if|else|for|while|do|break|continue|struct|switch|case|default|return|main|printf|scanf|elif|auto|enum|extern|goto|register|signed|sizeof|static|typedef|union|unsigned|volatile|while)(?!\w)',
+            'identifier': r'\b[a-zA-Z_][a-zA-Z0-9_]*\b',
+            'operator': r'(\+\+|--|->|&&|\|\||<<|>>|<=|>=|==|!=|[!%^&*+=\-\|/~<>\?])',
+            'delimiter': r'(\(|\)|\[|\]|\{|\}|;|,|:)',
+            'float': r'(?<!\w)[-+]?(\d*\.\d+|\d+\.\d*)([eE][-+]?\d+)?\b',
+            'integer': r'\d+[a-zA-Z]*',
+            'string': r'"[^"\n]*"',
         }
-            #
+        #
         token_regex = '|'.join('(?P<%s>%s)' % (name, exp)
-                                for name, exp in regex.items())
-            # print('token regex', token_regex)
-            # i = 0
-            # self.posicaoInicial = 0
-        # TOKEN_TYPES = {
-        # 'IDENTIFIER': Identifier,
-        # 'INTEGER': Integer,
-        # 'FLOAT': Float,
-        # 'OPERATOR': Operator,
-        # 'DELIMITER': Delimiter,
-        # }
+                               for name, exp in regex.items())
+        # agrupando o dic regex 
+        print('token regex', token_regex)
+
+
         tokens_list = []
-        for line in arquivo.split('\n'):
-            print('aqui?')
+        errors = []
+        last_lexeme = None
+        i = 0
+        codigoFonte = re.sub(
+            r'(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)', '', codigoFonte)
+        for line in codigoFonte.split('\n'):
             for match in re.finditer(token_regex, line):
                 for name, exp in regex.items():
                     if(match.lastgroup == name):
                         token_type = name
                         lexeme = match.group(name)
-                        print('lexeme', lexeme)
+                        print(token_type)
+                        print(lexeme)
+                        ###############################
                         try:
-                            print('oi')
-                            if Identifier(lexeme).validate():
-                                tokens_list.append((token_type, lexeme))
-                        except IdentifierException as e:
-                            print('Error: {}'.format(e)) 
-                        try:
-                            if Integer(lexeme).validate():
-                                tokens_list.append((token_type, lexeme))
-                        except IntegerException as e:
-                                print('Error: {}'.format(e))
+                            if token_type == 'keyword':
+                                print(token_type)
+                                if lexeme in types and last_lexeme in types:
+                                    print(
+                                        "Identificador Inválido pois não pode ser uma palavra reservada")
+                                else:
+                                    if Keyword(lexeme).validate():
+                                        tokens_list.append(
+                                            (token_type, lexeme))
+                                    else:
+                                        print("Error!")
+                                        errors.append(
+                                            'O lexeme {} não é válido'.format(lexeme))
 
-                        try:
-                            if Float(lexeme).validate():
-                                tokens_list.append((token_type, lexeme))
-                        except FloatException as e:
-                                print('Error: {}'.format(e))
-                        try:
-                            if Operator(lexeme).validate():
-                                tokens_list.append((token_type, lexeme))
-                        except OperatorException as e:
-                                print('Error: {}'.format(e))
-                        try:
-                            if Delimiter(lexeme).validate():
-                                tokens_list.append((token_type, lexeme))
-                        except DelimiterException as e:
-                                print('Error: {}'.format(e))
-                        try:
-                            if Keyword(lexeme).validate():
-                                tokens_list.append((token_type, lexeme))
-                        except KeywordException as e:
-                                print('Error: {}'.format(e)) 
-                return tokens_list
+                            elif token_type == 'identifier':
+                                print(token_type)
+                                if Identifier(lexeme).validate():
+                                    tokens_list.append((token_type, lexeme))
+                                else:
+                                    print("Error!")
+                                    errors.append(
+                                        'O lexeme {} não é válido'.format(lexeme))
+                            elif token_type == 'operator':
+                                if lexeme == '*' and (last_lexeme in types or last_lexeme in keywords or re.match(
+                                        regex['delimiter'], last_lexeme)):
+                                    token_type = 'pointer'
+                                    tokens_list.append((token_type, lexeme))
+                                    print(token_type)
+                                else:
+                                    if Operator(lexeme).validate():
+                                        tokens_list.append(
+                                            (token_type, lexeme))
+                                    else:
+                                        print("Error!")
+                                        errors.append(
+                                            'O lexeme {} não é válido'.format(lexeme))
+                            elif token_type == 'delimiter':
+                                if Delimiter(lexeme).validate():
+                                    tokens_list.append((token_type, lexeme))
+                                else:
+                                    print("Error!")
+                                    errors.append(
+                                        'O lexeme {} não é válido'.format(lexeme))
+                            elif token_type == 'integer':
+                                if re.match(r'^\d+$', lexeme):
+                                    if Integer(lexeme).validate():
+                                        tokens_list.append(
+                                            (token_type, lexeme))
+                                elif re.match(r"\d+\.\d+", lexeme):
+                                    if Float(lexeme).validate():
+                                        token_type = 'float'
+                                        tokens_list.append(
+                                            (token_type, lexeme))
+                                else:
+                                    token_type = 'identifier'
+                                    #print(token_type)
+                                    errors.append(
+                                        'O lexeme {} é um identificador inválido' .format(lexeme))
+            
+                                    #print("Este é um identificador inválido")
+                            elif token_type == 'float':
+                                print(token_type)
+                                if Float(lexeme).validate():
+                                    tokens_list.append((token_type, lexeme))
+                                else:
+                                    print("Error!")
+                                    errors.append(
+                                        'O lexeme {} não é válido'.format(lexeme))
+                            elif token_type == 'string':
+                                print(token_type)
+                                if StringValidation(lexeme).validate():
+                                    tokens_list.append((token_type, lexeme))
+                                else:
+                                    print("Error!")
+                                    errors.append(
+                                        'O lexeme {} não é válido'.format(lexeme))
+                        except ExceptionGenerator as e:
+                            print("Passou?")
+                            print("Error: {}".format(e))
+                            errors.append(
+                                'O lexeme {} não é válido'.format(lexeme))
+                        last_lexeme = lexeme
 
-                    # for token_type, lexeme in get_tokens(text):
-                    #     if token_type in TOKEN_TYPES:
-                    #         try:
-                    #             TOKEN_TYPES[token_type](lexeme).validate(token_type)
-                    #             tokens_list.append((token_type, lexeme))
-                    #         except TokenValidationException as e:
-                    #             print(f"Error: {e}")
-                    #     else:
-                    #         print(f"Error: Invalid token type {token_type}")
-                    #     for token_type, lexeme in tokens_list:
-                    #         print(f"Token type: {token_type.__name__}, Lexeme: {lexeme}")
-
-                    # int aaa
-                    # int bbb 
-                        # if token_type == 'identifier':
-                            # satsifaz aaa bbb
-
-                        # # try:
-                        #         Keyword(lexeme).validate()
-                        #         tokens_list.append((token_type, lexeme))
-                        # except KeywordException as e:
-                        #         print('Error: {}'.format(e)) 
-                        # elif(token_type == 'integer'):
-                        #     try:
-                        #         Integer(lexeme).validate()
-                        #         tokens_list.append((token_type, lexeme))
-                        #     except IntegerException as e:
-                        #         print('Error: {}'.format(e))
-                        # elif(token_type == 'float'):
-                        #     try:
-                        #         Float(lexeme).validate()
-                        #         tokens_list.append((token_type, lexeme))
-                        #     except FloatException as e:
-                        #         print('Error: {}'.format(e))
-                        # elif(token_type == 'operator'):
-                        #     try:
-                        #         Operator(lexeme).validate()
-                        #         tokens_list.append((token_type, lexeme))
-                        #     except OperatorException as e:
-                        #         print('Error: {}'.format(e))
-                        # elif(token_type == 'delimiter'):
-                        #     try:
-                        #         Delimiter(lexeme).validate()
-                        #         tokens_list.append((token_type, lexeme))
-                        #     except DelimiterException as e:
-                        #         print('Error: {}'.format(e))
-                        # else:
-                        #     # token = <tipo, valor>
-                        #     tokens_list.append((token_type, lexeme))
-      
-        
-
+        return tokens_list, errors

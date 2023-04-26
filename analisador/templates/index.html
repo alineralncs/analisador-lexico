@@ -1,90 +1,138 @@
 {% load bootstrap4%}
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analisador Léxico</title>
-  {% bootstrap_css %}
-</head>
-<style>
-  body {
-    /* background-color:#230f47; */
-    background-image: linear-gradient( #7175da, #9790F2);
-    background-repeat: no-repeat;
-    height: 100%;
-    background-attachment: fixed;
-  }
-  .row {
-    margin-top: 40px;
-    background-color:rgb(255, 255, 255);
-    border-radius: 30px;
-    color: #6B6471;
-    box-shadow: 0 10px 10px rgba(68, 68, 68, 0.2);
-    /* box-shadow: 0 0 10px rgba(69, 69, 69, 0.9); */
-    /* -webkit-box-shadow: 0 0 10px rgba(71, 71, 71, 0.6); */
-  }
-  #id_nome {
-    background-color: transparent;
-    border-radius: 30px;
-
-  }
-  /* #id_nome:hover {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analisador Léxico</title>
+    {% bootstrap_css %}
+  </head>
+  <style>
+    body {
+      /* background-color:#230f47; */
+      background-image: linear-gradient(#7175da, #9790f2);
+      background-repeat: no-repeat;
+      height: 100%;
+      background-attachment: fixed;
+    }
+    .row {
+      margin-top: 40px;
+      background-color: rgb(255, 255, 255);
+      border-radius: 30px;
+      color: #6b6471;
+      box-shadow: 0 10px 10px rgba(68, 68, 68, 0.2);
+      /* box-shadow: 0 0 10px rgba(69, 69, 69, 0.9); */
+      /* -webkit-box-shadow: 0 0 10px rgba(71, 71, 71, 0.6); */
+    }
+    #id_nome {
+      background-color: transparent;
+      border-radius: 30px;
+    }
+    /* #id_nome:hover {
     background-color: #ffd6eb32;
     color:white;
   } */
-  
-  .btn {
-    background-color: #2A265F;
-    border: #DE88B9;
-    border-radius: 30px;
-  }
-  .btn:hover {
-    background-color: #DE88B9;
-    border: #e16daf;
-    border-radius: 30px;
-  }
-  .nome{
-    background-color: #2A265F;
-    color: #fff;
-    border-radius:30px 0px 0px 30px;
-  }
 
-</style>
+    .btn {
+      background-color: #2a265f;
+      border: #de88b9;
+      border-radius: 30px;
+    }
+    .btn:hover {
+      background-color: #de88b9;
+      border: #e16daf;
+      border-radius: 30px;
+    }
+    .nome {
+      background-color: #2a265f;
+      color: #fff;
+      border-radius: 30px 0px 0px 30px;
+    }
+  </style>
 
-<body>
-  <div class="d-flex justify-content-center align-items-center">
-
-    <!-- <div class="container justify-content-center align-items-center" > -->
+  <body>
+    <div class="container justify-content-center align-items-center">
+      <!-- <div class="container justify-content-center align-items-center" > -->
       <div class="row row-cols-2">
-        <div class="col-3 col-sm-3  nome p-3">
+        <div class="col-3 col-sm-3 nome p-3">
           <h1 class="texto-principal">Analisador Léxico</h1>
         </div>
+
         <div class="col-9 col-sm-9 p-3">
-      
-          <form action="{%url 'analisador'%}" method="POST" class="form" enctype="multipart/form-data" >
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
-            <button type="submit" class="btn btn-primary" align="center">Analisar arquivo</button>
+          <form
+            action="{%url 'analisador'%}"
+            method="POST"
+            class="form"
+            enctype="multipart/form-data"
+          >
+            {% csrf_token %} {% bootstrap_form form %} {% buttons %}
+            <button type="submit" class="btn btn-primary" align="center">
+              Analisar arquivo
+            </button>
             {% endbuttons %}
           </form>
-        <!-- </div> -->
+        </div>
       </div>
 
+      <div class="row justify-content-md-center p-5">
 
+        {% comment %} <div class="container justify-content-md-center p-5">
+          <div class="row"> {% endcomment %}
+            <div class="col-md">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Arquivo</th>
+                    <th>Ação</th>
+                    <th>Resultado</th>
+                    <th>Erros</th>
+                  </tr>
+                </thead>
 
-  </div>
- 
-    {% comment %} <div class="container">
+                {% for arquivo in arquivos %}
+                
+                <tbody>
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ arquivo.nome }}</td>
+                    <td>{{ arquivo.arquivo }}</td>
+                    <td>
+                      <a href="{% url 'deletar_arquivo' arquivo.pk %}" class="btn btn-danger btn-sm">excluir</a>
+                    </td>
+                    {% for analise in analisar_arquivo %}
+                    <td>{{ analise }}</td>
+                    
+                    {% endfor %} 
+                    
+                  </tr>
+                </tbody>
+                {% empty %}
+                <tbody>
+                  <tr>
+                    <td colspan="6">Nenhum arquivo encontrado.</td>
+                  </tr>
+                </tbody>
+          
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+          <div class="row justify-content-md-center p-5">
 
-    
-    </div> {% endcomment %}
-  
-  </div>
+            <div class="col-md-6">
+              {% for conteudo in file_content %}
+               {{conteudo}}
+                {% endfor %}
+            </div>
+          </div>
 
-  {% bootstrap_javascript jquery='full'%}
-</body>
+        {% comment %} </div>
+        
+      </div> {% endcomment %}
+    </div>
 
+    {% bootstrap_javascript jquery='full'%}
+  </body>
 </html>
